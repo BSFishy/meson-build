@@ -990,8 +990,8 @@ const TIDY = 'tidy';
 const DIRECTORY = 'directory';
 const SETUP_OPTIONS = 'setup-options';
 const OPTIONS = 'options';
-const NINJA_VERSION = 'meson-version';
-const MESON_VERSION = 'ninja-version';
+const NINJA_VERSION = 'ninja-version';
+const MESON_VERSION = 'meson-version';
 const GCOVR_VERSION = 'gcovr-version';
 var MesonAction;
 (function (MesonAction) {

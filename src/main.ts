@@ -23,8 +23,8 @@ const TIDY: string = 'tidy';
 const DIRECTORY: string = 'directory';
 const SETUP_OPTIONS: string = 'setup-options';
 const OPTIONS: string = 'options';
-const NINJA_VERSION: string = 'meson-version';
-const MESON_VERSION: string = 'ninja-version';
+const NINJA_VERSION: string = 'ninja-version';
+const MESON_VERSION: string = 'meson-version';
 const GCOVR_VERSION: string = 'gcovr-version';
 
 enum MesonAction {
