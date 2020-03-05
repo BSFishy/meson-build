@@ -65,7 +65,7 @@ function processActionArg(): MesonAction {
 function processArgs() {
     core.debug('Processing args...');
 
-    processActionArg();
+    action = processActionArg();
 
     directory = core.getInput(DIRECTORY);
     core.debug(`Processing directory argument: ${directory}`);
