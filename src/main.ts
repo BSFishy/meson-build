@@ -8,7 +8,7 @@ const NINJA: string = 'ninja';
 const MESON: string = 'meson';
 const PYTHON: string = 'python';
 const CLANG_TIDY: string = 'clang-tidy';
-const GCOVR: string = 'gcovr'
+const GCOVR: string = 'gcovr';
 
 const NINJA_FILE: string = 'build.ninja';
 
