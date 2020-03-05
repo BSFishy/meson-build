@@ -982,11 +982,6 @@ const CLANG_TIDY = 'clang-tidy';
 const GCOVR = 'gcovr';
 const NINJA_FILE = 'build.ninja';
 const ACTION = 'action';
-const BUILD = 'build';
-const INSTALL = 'install';
-const TEST = 'test';
-const COVERAGE = 'coverage';
-const TIDY = 'tidy';
 const DIRECTORY = 'directory';
 const SETUP_OPTIONS = 'setup-options';
 const OPTIONS = 'options';
@@ -995,12 +990,17 @@ const MESON_VERSION = 'meson-version';
 const GCOVR_VERSION = 'gcovr-version';
 var MesonAction;
 (function (MesonAction) {
-    MesonAction[MesonAction["Build"] = 0] = "Build";
-    MesonAction[MesonAction["Install"] = 1] = "Install";
-    MesonAction[MesonAction["Test"] = 2] = "Test";
-    MesonAction[MesonAction["Coverage"] = 3] = "Coverage";
-    MesonAction[MesonAction["Tidy"] = 4] = "Tidy";
+    MesonAction["Build"] = "build";
+    MesonAction["Install"] = "install";
+    MesonAction["Test"] = "test";
+    MesonAction["Coverage"] = "coverage";
+    MesonAction["Tidy"] = "tidy";
 })(MesonAction || (MesonAction = {}));
+const BUILD = MesonAction.Build;
+const INSTALL = MesonAction.Install;
+const TEST = MesonAction.Test;
+const COVERAGE = MesonAction.Coverage;
+const TIDY = MesonAction.Tidy;
 var action;
 var directory;
 var setupOptions;
@@ -1183,32 +1183,32 @@ function run() {
             }
             var command = '';
             var args = [];
-            core.debug('Building arguments array');
+            core.debug(`Building arguments array for ${action}`);
             switch (action) {
                 case MesonAction.Build:
                     command = ninja;
-                    args = ['-C', directory];
+                    args = args.concat('-C', directory);
                     break;
                 case MesonAction.Install:
                     command = meson;
-                    args = [INSTALL, '-C', directory];
+                    args = args.concat(INSTALL, '-C', directory);
                     break;
                 case MesonAction.Test:
                     command = meson;
-                    args = [TEST, '-C', directory];
+                    args = args.concat(TEST, '-C', directory);
                     break;
                 case MesonAction.Coverage:
                     command = yield findCoverage();
-                    args = ['-C', directory, COVERAGE];
+                    args = args.concat('-C', directory, COVERAGE);
                     break;
                 case MesonAction.Tidy:
                     command = yield findTidy();
-                    args = ['-C', directory, CLANG_TIDY];
+                    args = args.concat('-C', directory, CLANG_TIDY);
                     break;
             }
             if (options)
                 args = args.concat(options);
-            core.debug(`Running Meson: ${command} ${args.join(' ')}`);
+            core.debug(`Running: ${command} ${args.join(' ')}`);
             yield exec.exec(command, args);
         }
         catch (err) {

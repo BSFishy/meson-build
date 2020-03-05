@@ -13,12 +13,6 @@ const GCOVR: string = 'gcovr'
 const NINJA_FILE: string = 'build.ninja';
 
 const ACTION: string = 'action';
-const BUILD: string = 'build';
-const INSTALL: string = 'install';
-const TEST: string = 'test';
-const COVERAGE: string = 'coverage';
-const TIDY: string = 'tidy';
-
 const DIRECTORY: string = 'directory';
 const SETUP_OPTIONS: string = 'setup-options';
 const OPTIONS: string = 'options';
@@ -27,12 +21,18 @@ const MESON_VERSION: string = 'meson-version';
 const GCOVR_VERSION: string = 'gcovr-version';
 
 enum MesonAction {
-    Build,
-    Install,
-    Test,
-    Coverage,
-    Tidy
+    Build = 'build',
+    Install = 'install',
+    Test = 'test',
+    Coverage = 'coverage',
+    Tidy = 'tidy'
 }
+
+const BUILD: string = MesonAction.Build;
+const INSTALL: string = MesonAction.Install;
+const TEST: string = MesonAction.Test;
+const COVERAGE: string = MesonAction.Coverage;
+const TIDY: string = MesonAction.Tidy;
 
 var action: MesonAction;
 var directory: string;
@@ -241,34 +241,34 @@ export async function run() {
         var command: string = '';
         var args: string[] = [];
 
-        core.debug('Building arguments array');
+        core.debug(`Building arguments array for ${action}`);
         switch (action) {
             case MesonAction.Build:
                 command = ninja;
-                args = ['-C', directory];
+                args = args.concat('-C', directory);
                 break;
             case MesonAction.Install:
                 command = meson;
-                args = [INSTALL, '-C', directory];
+                args = args.concat(INSTALL, '-C', directory);
                 break;
             case MesonAction.Test:
                 command = meson;
-                args = [TEST, '-C', directory];
+                args = args.concat(TEST, '-C', directory);
                 break;
             case MesonAction.Coverage:
                 command = await findCoverage();
-                args = ['-C', directory, COVERAGE];
+                args = args.concat('-C', directory, COVERAGE);
                 break;
             case MesonAction.Tidy:
                 command = await findTidy();
-                args = ['-C', directory, CLANG_TIDY];
+                args = args.concat('-C', directory, CLANG_TIDY);
                 break;
         }
 
         if (options)
             args = args.concat(options);
         
-        core.debug(`Running Meson: ${command} ${args.join(' ')}`);
+        core.debug(`Running: ${command} ${args.join(' ')}`);
         await exec.exec(command, args);
     } catch (err) {
         core.setFailed(err.message);
