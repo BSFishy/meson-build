@@ -1137,7 +1137,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             processArgs();
-            findMeson();
+            yield findMeson();
             if (!fs.existsSync(directory) || !fs.existsSync(path.join(directory, NINJA_FILE))) {
                 core.info('Project isn\'t setup yet. Setting it up.');
                 let setupArgs = ['setup', directory];
@@ -1168,12 +1168,12 @@ function run() {
                     args = [TEST, '-C', directory];
                     break;
                 case MesonAction.Coverage:
-                    checkCoverage();
+                    yield checkCoverage();
                     command = NINJA;
                     args = ['-C', directory, COVERAGE];
                     break;
                 case MesonAction.Tidy:
-                    checkTidy();
+                    yield checkTidy();
                     command = NINJA;
                     args = ['-C', directory, CLANG_TIDY];
                     break;
