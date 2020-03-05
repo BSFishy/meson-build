@@ -105,17 +105,17 @@ The lifecycle of the action is fairly important.
 Luckily, it is fairly simple.
 Here is what it looks like:
 
- 1. Process the inputs
+ 1. Process the inputs.
   First, we need to get all of our inputs and figure out what exactly they are. The main part of this step is to format the `action` input. We just need to make sure it is a valid value.
- 2. Check for Ninja
+ 2. Check for Ninja.
   Next, we need to make sure Ninja is installed. Ninja is a dependency of Meson, so we do a simple check if it is on the current system. If not, it is installed through pip.
- 3. Check for Meson
+ 3. Check for Meson.
   We also need to make sure Meson is installed. If Meson is not already installed, it is installed through pip.
  4. Check if the project is setup.
   We need to check if the project is setup. This will check if the build directory exists and if the `build.ninja` file exists in that directory. If either of those are missing, a `meson setup` command will be called to setup the project. If either of those are missing even after running the setup command, it is assumed that the project has an error, and it exits.
- 5. Build the command
+ 5. Build the command.
   Next, we build the command that is to be run. Based on the action to run, an executable and basic set of arguments are selected that correspond to that command. Any dependencies (i.e. Gcovr or Clang-Tidy) are also installed if their respective actions are used. Finally, the `options` input is appended to the arguments.
- 6. Run the command
+ 6. Run the command.
   Finally, we run the command that was built in the previous step.
 
 ## License
