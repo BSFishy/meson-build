@@ -1,0 +1,21 @@
+name: Meson Build
+author: BSFishy
+description: Run a Meson task during your Actions workflow
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'arrow-down'
+  color: 'green'
+inputs:
+  action:
+    description: The action to run
+    required: true
+  directory:
+    description: The directory to build the project to
+    required: false
+    default: 'build'
+  options:
+    description: Additional options to pass to Meson
+    required: false
+    default: ''

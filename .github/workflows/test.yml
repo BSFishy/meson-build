@@ -1,0 +1,39 @@
+name: Test
+on: [push]
+jobs:
+  functionality:
+    name: Functionality
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [2.7, 3.6, 3.7, 3.8, pypy2, pypy3]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run Meson
+      uses: ./
+      with:
+        action: build
+    - name: Run Meson
+      uses: ./
+      with:
+        action: test
+  code:
+    name: Code
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - name: Install dependencies
+      run: npm install
+    - name: Run tests
+      run: npm test

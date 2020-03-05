@@ -1,0 +1,12 @@
+node_modules/
+
+lib/
+
+logs
+*.log
+
+build/Release
+
+*.tsbuildinfo
+
+.npm
