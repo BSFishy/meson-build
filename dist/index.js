@@ -1187,23 +1187,23 @@ function run() {
             switch (action) {
                 case MesonAction.Build:
                     command = ninja;
-                    args = args.concat('-C', directory);
+                    args = ['-C', directory];
                     break;
                 case MesonAction.Install:
                     command = meson;
-                    args = args.concat(INSTALL, '-C', directory);
+                    args = [INSTALL, '-C', directory];
                     break;
                 case MesonAction.Test:
                     command = meson;
-                    args = args.concat(TEST, '-C', directory);
+                    args = [TEST, '-C', directory];
                     break;
                 case MesonAction.Coverage:
                     command = yield findCoverage();
-                    args = args.concat('-C', directory, COVERAGE);
+                    args = ['-C', directory, COVERAGE];
                     break;
                 case MesonAction.Tidy:
                     command = yield findTidy();
-                    args = args.concat('-C', directory, CLANG_TIDY);
+                    args = ['-C', directory, CLANG_TIDY];
                     break;
             }
             if (options)
