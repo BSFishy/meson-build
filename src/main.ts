@@ -4,15 +4,13 @@ import * as io from '@actions/io';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// var hasbin = require('hasbin');
-
 const NINJA: string = 'ninja';
 const MESON: string = 'meson';
 const PYTHON: string = 'python';
 const CLANG_TIDY: string = 'clang-tidy';
 const GCOVR: string = 'gcovr'
 
-const NINJA_FILE: string = 'ninja.build';
+const NINJA_FILE: string = 'build.ninja';
 
 const ACTION: string = 'action';
 const BUILD: string = 'build';
@@ -131,13 +129,6 @@ async function findPython(): Promise<string> {
             throw new Error('Python could not be found');
 
         core.debug('Found Python using which');
-
-        // if (hasbin.sync(PYTHON)) {
-        //     core.debug('Found Python in the path');
-        //     python = PYTHON;
-        // } else {
-        //     throw new Error('Python could not be found');
-        // }
     }
 
     pythonCache = python;
@@ -146,11 +137,6 @@ async function findPython(): Promise<string> {
 
 async function findNinja(): Promise<string> {
     core.debug('Checking for Ninja...');
-
-    // if (hasbin.sync(NINJA)) {
-    //     core.debug('Found Ninja in the path')
-    //     return;
-    // }
 
     try {
         const ninja: string = await io.which(NINJA);
@@ -175,12 +161,6 @@ async function findNinja(): Promise<string> {
 async function findMeson(): Promise<string> {
     core.debug('Checking for Meson...');
 
-    // await checkNinja();
-
-    // if (hasbin.sync(MESON)) {
-    //     core.debug('Found Meson in the path');
-    //     return;
-    // }
     try {
         const meson: string = await io.which(MESON);
         if (meson.length < 1)
@@ -203,11 +183,6 @@ async function findMeson(): Promise<string> {
 
 async function findCoverage(): Promise<string> {
     core.debug(`Checking for ${COVERAGE}`);
-
-    // if (hasbin.sync(GCOVR)) {
-    //     core.debug('Found gcovr in the path');
-    //     return;
-    // }
     
     try {
         const gcovr: string = await io.which(GCOVR);
@@ -237,8 +212,6 @@ async function findTidy(): Promise<string> {
         throw new Error('Clang-tidy must be installed to run it');
     
     return tidy;
-    // if (!hasbin.sync(CLANG_TIDY))
-    //     throw new Error('Clang-tidy must be installed to run it');
 }
 
 export async function run() {

@@ -975,13 +975,12 @@ const exec = __importStar(__webpack_require__(986));
 const io = __importStar(__webpack_require__(1));
 const path = __importStar(__webpack_require__(622));
 const fs = __importStar(__webpack_require__(747));
-// var hasbin = require('hasbin');
 const NINJA = 'ninja';
 const MESON = 'meson';
 const PYTHON = 'python';
 const CLANG_TIDY = 'clang-tidy';
 const GCOVR = 'gcovr';
-const NINJA_FILE = 'ninja.build';
+const NINJA_FILE = 'build.ninja';
 const ACTION = 'action';
 const BUILD = 'build';
 const INSTALL = 'install';
@@ -1086,12 +1085,6 @@ function findPython() {
             if (python.length < 1)
                 throw new Error('Python could not be found');
             core.debug('Found Python using which');
-            // if (hasbin.sync(PYTHON)) {
-            //     core.debug('Found Python in the path');
-            //     python = PYTHON;
-            // } else {
-            //     throw new Error('Python could not be found');
-            // }
         }
         pythonCache = python;
         return python;
@@ -1100,10 +1093,6 @@ function findPython() {
 function findNinja() {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug('Checking for Ninja...');
-        // if (hasbin.sync(NINJA)) {
-        //     core.debug('Found Ninja in the path')
-        //     return;
-        // }
         try {
             const ninja = yield io.which(NINJA);
             if (ninja.length < 1)
@@ -1125,11 +1114,6 @@ function findNinja() {
 function findMeson() {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug('Checking for Meson...');
-        // await checkNinja();
-        // if (hasbin.sync(MESON)) {
-        //     core.debug('Found Meson in the path');
-        //     return;
-        // }
         try {
             const meson = yield io.which(MESON);
             if (meson.length < 1)
@@ -1151,10 +1135,6 @@ function findMeson() {
 function findCoverage() {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug(`Checking for ${COVERAGE}`);
-        // if (hasbin.sync(GCOVR)) {
-        //     core.debug('Found gcovr in the path');
-        //     return;
-        // }
         try {
             const gcovr = yield io.which(GCOVR);
             if (gcovr.length < 1)
@@ -1180,8 +1160,6 @@ function findTidy() {
         if (tidy.length < 1)
             throw new Error('Clang-tidy must be installed to run it');
         return tidy;
-        // if (!hasbin.sync(CLANG_TIDY))
-        //     throw new Error('Clang-tidy must be installed to run it');
     });
 }
 function run() {
