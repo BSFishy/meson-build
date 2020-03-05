@@ -1,9 +1,10 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import * as io from '@actions/io';
 import * as path from 'path';
 import * as fs from 'fs';
 
-var hasbin = require('hasbin');
+// var hasbin = require('hasbin');
 
 const NINJA: string = 'ninja';
 const MESON: string = 'meson';
@@ -110,7 +111,7 @@ function processArgs() {
 }
 
 var pythonCache: string | undefined = undefined;
-function findPython(): string {
+async function findPython(): Promise<string> {
     core.debug('Searching for Python...');
 
     if (pythonCache) {
@@ -125,71 +126,101 @@ function findPython(): string {
         core.debug('Found Python from setup-python action');
         python = path.join(envLocation, PYTHON);
     } else {
-        if (hasbin.sync(PYTHON)) {
-            core.debug('Found Python in the path');
-            python = PYTHON;
-        } else {
-            throw new Error('Python could not be found');
-        }
+        python = await io.which(PYTHON);
+        core.debug('Found Python using which');
+
+        // if (hasbin.sync(PYTHON)) {
+        //     core.debug('Found Python in the path');
+        //     python = PYTHON;
+        // } else {
+        //     throw new Error('Python could not be found');
+        // }
     }
 
     pythonCache = python;
     return python;
 }
 
-async function checkNinja() {
+async function findNinja(): Promise<string> {
     core.debug('Checking for Ninja...');
 
-    if (hasbin.sync(NINJA)) {
-        core.debug('Found Ninja in the path')
-        return;
+    // if (hasbin.sync(NINJA)) {
+    //     core.debug('Found Ninja in the path')
+    //     return;
+    // }
+
+    try {
+        const ninja: string = await io.which(NINJA);
+        core.debug('Found Ninja using which');
+        return ninja;
+    } catch {
+        core.info(`Installing Ninja version ${ninjaVersion}`);
+        const python: string = await findPython();
+        await exec.exec(python, ['-m', 'pip', 'install', `ninja==${ninjaVersion}`]);
+
+        return await io.which(NINJA);
     }
-    
-    core.info(`Installing Ninja version ${ninjaVersion}`);
-    const python: string = findPython();
-    await exec.exec(python, ['-m', 'pip', 'install', `ninja==${ninjaVersion}`]);
 }
 
-async function findMeson() {
+async function findMeson(): Promise<string> {
     core.debug('Checking for Meson...');
 
-    await checkNinja();
+    // await checkNinja();
 
-    if (hasbin.sync(MESON)) {
-        core.debug('Found Meson in the path');
-        return;
+    // if (hasbin.sync(MESON)) {
+    //     core.debug('Found Meson in the path');
+    //     return;
+    // }
+    try {
+        const meson: string = await io.which(MESON);
+        core.debug('Found Meson using which');
+        return meson;
+    } catch {
+        core.info(`Installing Meson version ${mesonVersion}`);
+        const python: string = await findPython();
+        await exec.exec(python, ['-m', 'pip', 'install', `meson==${mesonVersion}`]);
+
+        return await io.which(MESON);
     }
-    
-    core.info(`Installing Meson version ${mesonVersion}`);
-    const python: string = findPython();
-    await exec.exec(python, ['-m', 'pip', 'install', `meson==${mesonVersion}`]);
 }
 
-async function checkCoverage() {
+async function findCoverage(): Promise<string> {
     core.debug(`Checking for ${COVERAGE}`);
 
-    if (hasbin.sync(GCOVR)) {
-        core.debug('Found gcovr in the path');
-        return;
-    }
+    // if (hasbin.sync(GCOVR)) {
+    //     core.debug('Found gcovr in the path');
+    //     return;
+    // }
     
-    core.info(`Installing gcovr version ${gcovrVersion}`);
-    const python: string = findPython();
-    await exec.exec(python, ['-m', 'pip', 'install', `gcovr==${gcovrVersion}`]);
+    try {
+        const gcovr: string = await io.which(GCOVR);
+        core.debug('Found gcovr using which');
+        return gcovr;
+    } catch {
+        core.info(`Installing gcovr version ${gcovrVersion}`);
+        const python: string = await findPython();
+        await exec.exec(python, ['-m', 'pip', 'install', `gcovr==${gcovrVersion}`]);
+
+        return await io.which(GCOVR);
+    }
 }
 
-function checkTidy() {
+async function findTidy(): Promise<string> {
     core.debug(`Checking for ${CLANG_TIDY}`);
 
-    if (!hasbin.sync(CLANG_TIDY))
-        throw new Error('Clang-tidy must be installed to run it');
+    return await io.which(CLANG_TIDY);
+    // if (!hasbin.sync(CLANG_TIDY))
+    //     throw new Error('Clang-tidy must be installed to run it');
 }
 
 export async function run() {
     try {
         processArgs();
 
-        await findMeson();
+        const ninja: string = await findNinja();
+        const meson: string = await findMeson();
+        let gcovr: string = '';
+        let clangTidy: string = '';
 
         if (!fs.existsSync(directory) || !fs.existsSync(path.join(directory, NINJA_FILE))) {
             core.info('Project isn\'t setup yet. Setting it up.');
@@ -200,8 +231,8 @@ export async function run() {
             if (setupOptions)
                 setupArgs = setupArgs.concat(setupOptions);
             
-            core.debug(`Running Meson setup: ${MESON} ${setupArgs.join(' ')}`);
-            await exec.exec(MESON, setupArgs);
+            core.debug(`Running Meson setup: ${meson} ${setupArgs.join(' ')}`);
+            await exec.exec(meson, setupArgs);
         }
 
         if (!fs.existsSync(path.join(directory, NINJA_FILE))) {
@@ -214,27 +245,23 @@ export async function run() {
         core.debug('Building arguments array');
         switch (action) {
             case MesonAction.Build:
-                command = NINJA;
+                command = ninja;
                 args = ['-C', directory];
                 break;
             case MesonAction.Install:
-                command = MESON;
+                command = meson;
                 args = [INSTALL, '-C', directory];
                 break;
             case MesonAction.Test:
-                command = MESON;
+                command = meson;
                 args = [TEST, '-C', directory];
                 break;
             case MesonAction.Coverage:
-                await checkCoverage();
-
-                command = NINJA;
+                command = await findCoverage();
                 args = ['-C', directory, COVERAGE];
                 break;
             case MesonAction.Tidy:
-                await checkTidy();
-
-                command = NINJA;
+                command = await findTidy();
                 args = ['-C', directory, CLANG_TIDY];
                 break;
         }

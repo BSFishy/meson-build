@@ -23,7 +23,7 @@
     "dependencies": {
         "@actions/core": "^1.0.0",
         "@actions/exec": "^1.0.0",
-        "hasbin": "^1.2.3"
+        "@actions/io": "^1.0.0"
     },
     "devDependencies": {
         "@types/jest": "^24.0.13",
