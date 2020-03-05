@@ -13,9 +13,25 @@ inputs:
     required: true
   directory:
     description: The directory to build the project to
-    required: false
+    required: true
     default: 'build'
+  setup-options:
+    description: Additional options to pass to Meson during setup
+    required: false
+    default: ''
   options:
     description: Additional options to pass to Meson
     required: false
     default: ''
+  meson-version:
+    description: The version of Meson to use
+    required: true
+    default: '0.53.2'
+  ninja-version:
+    description: The version of Ninja to use
+    required: true
+    default: '1.9.0.post1'
+  gcovr-version:
+    description: The version of gcovr to use (If doing coverage)
+    required: true
+    default: '4.2'
