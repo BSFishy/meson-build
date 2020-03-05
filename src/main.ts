@@ -104,7 +104,7 @@ function processArgs() {
     }
 
     gcovrVersion = core.getInput(GCOVR_VERSION);
-    core.debug(`Processing meson version argument: ${gcovrVersion}`);
+    core.debug(`Processing gcovr version argument: ${gcovrVersion}`);
     if (gcovrVersion.length < 1) {
         throw new Error('No gcovr version specified');
     }
@@ -127,6 +127,9 @@ async function findPython(): Promise<string> {
         python = path.join(envLocation, PYTHON);
     } else {
         python = await io.which(PYTHON);
+        if (python.length < 1)
+            throw new Error('Python could not be found');
+
         core.debug('Found Python using which');
 
         // if (hasbin.sync(PYTHON)) {
@@ -151,6 +154,9 @@ async function findNinja(): Promise<string> {
 
     try {
         const ninja: string = await io.which(NINJA);
+        if (ninja.length < 1)
+            throw new Error();
+
         core.debug('Found Ninja using which');
         return ninja;
     } catch {
@@ -158,7 +164,11 @@ async function findNinja(): Promise<string> {
         const python: string = await findPython();
         await exec.exec(python, ['-m', 'pip', 'install', `ninja==${ninjaVersion}`]);
 
-        return await io.which(NINJA);
+        const ninja: string = await io.which(NINJA);
+        if (ninja.length < 1)
+            throw new Error('Ninja could not be found after installing');
+        
+        return ninja;
     }
 }
 
@@ -173,6 +183,9 @@ async function findMeson(): Promise<string> {
     // }
     try {
         const meson: string = await io.which(MESON);
+        if (meson.length < 1)
+            throw new Error();
+
         core.debug('Found Meson using which');
         return meson;
     } catch {
@@ -180,7 +193,11 @@ async function findMeson(): Promise<string> {
         const python: string = await findPython();
         await exec.exec(python, ['-m', 'pip', 'install', `meson==${mesonVersion}`]);
 
-        return await io.which(MESON);
+        const meson: string = await io.which(MESON);
+        if (meson.length < 1)
+            throw new Error('Meson could not be found after installing');
+        
+        return meson;
     }
 }
 
@@ -194,6 +211,9 @@ async function findCoverage(): Promise<string> {
     
     try {
         const gcovr: string = await io.which(GCOVR);
+        if (gcovr.length < 1)
+            throw new Error();
+
         core.debug('Found gcovr using which');
         return gcovr;
     } catch {
@@ -201,14 +221,22 @@ async function findCoverage(): Promise<string> {
         const python: string = await findPython();
         await exec.exec(python, ['-m', 'pip', 'install', `gcovr==${gcovrVersion}`]);
 
-        return await io.which(GCOVR);
+        const gcovr: string = await io.which(GCOVR);
+        if (gcovr.length < 1)
+            throw new Error('gcovr could not be found after installing');
+        
+        return gcovr;
     }
 }
 
 async function findTidy(): Promise<string> {
     core.debug(`Checking for ${CLANG_TIDY}`);
 
-    return await io.which(CLANG_TIDY);
+    const tidy: string = await io.which(CLANG_TIDY);
+    if (tidy.length < 1)
+        throw new Error('Clang-tidy must be installed to run it');
+    
+    return tidy;
     // if (!hasbin.sync(CLANG_TIDY))
     //     throw new Error('Clang-tidy must be installed to run it');
 }
@@ -219,8 +247,6 @@ export async function run() {
 
         const ninja: string = await findNinja();
         const meson: string = await findMeson();
-        let gcovr: string = '';
-        let clangTidy: string = '';
 
         if (!fs.existsSync(directory) || !fs.existsSync(path.join(directory, NINJA_FILE))) {
             core.info('Project isn\'t setup yet. Setting it up.');

@@ -1062,7 +1062,7 @@ function processArgs() {
         throw new Error('No Meson version specified');
     }
     gcovrVersion = core.getInput(GCOVR_VERSION);
-    core.debug(`Processing meson version argument: ${gcovrVersion}`);
+    core.debug(`Processing gcovr version argument: ${gcovrVersion}`);
     if (gcovrVersion.length < 1) {
         throw new Error('No gcovr version specified');
     }
@@ -1083,6 +1083,8 @@ function findPython() {
         }
         else {
             python = yield io.which(PYTHON);
+            if (python.length < 1)
+                throw new Error('Python could not be found');
             core.debug('Found Python using which');
             // if (hasbin.sync(PYTHON)) {
             //     core.debug('Found Python in the path');
@@ -1104,6 +1106,8 @@ function findNinja() {
         // }
         try {
             const ninja = yield io.which(NINJA);
+            if (ninja.length < 1)
+                throw new Error();
             core.debug('Found Ninja using which');
             return ninja;
         }
@@ -1111,7 +1115,10 @@ function findNinja() {
             core.info(`Installing Ninja version ${ninjaVersion}`);
             const python = yield findPython();
             yield exec.exec(python, ['-m', 'pip', 'install', `ninja==${ninjaVersion}`]);
-            return yield io.which(NINJA);
+            const ninja = yield io.which(NINJA);
+            if (ninja.length < 1)
+                throw new Error('Ninja could not be found after installing');
+            return ninja;
         }
     });
 }
@@ -1125,6 +1132,8 @@ function findMeson() {
         // }
         try {
             const meson = yield io.which(MESON);
+            if (meson.length < 1)
+                throw new Error();
             core.debug('Found Meson using which');
             return meson;
         }
@@ -1132,7 +1141,10 @@ function findMeson() {
             core.info(`Installing Meson version ${mesonVersion}`);
             const python = yield findPython();
             yield exec.exec(python, ['-m', 'pip', 'install', `meson==${mesonVersion}`]);
-            return yield io.which(MESON);
+            const meson = yield io.which(MESON);
+            if (meson.length < 1)
+                throw new Error('Meson could not be found after installing');
+            return meson;
         }
     });
 }
@@ -1145,6 +1157,8 @@ function findCoverage() {
         // }
         try {
             const gcovr = yield io.which(GCOVR);
+            if (gcovr.length < 1)
+                throw new Error();
             core.debug('Found gcovr using which');
             return gcovr;
         }
@@ -1152,14 +1166,20 @@ function findCoverage() {
             core.info(`Installing gcovr version ${gcovrVersion}`);
             const python = yield findPython();
             yield exec.exec(python, ['-m', 'pip', 'install', `gcovr==${gcovrVersion}`]);
-            return yield io.which(GCOVR);
+            const gcovr = yield io.which(GCOVR);
+            if (gcovr.length < 1)
+                throw new Error('gcovr could not be found after installing');
+            return gcovr;
         }
     });
 }
 function findTidy() {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug(`Checking for ${CLANG_TIDY}`);
-        return yield io.which(CLANG_TIDY);
+        const tidy = yield io.which(CLANG_TIDY);
+        if (tidy.length < 1)
+            throw new Error('Clang-tidy must be installed to run it');
+        return tidy;
         // if (!hasbin.sync(CLANG_TIDY))
         //     throw new Error('Clang-tidy must be installed to run it');
     });
@@ -1170,8 +1190,6 @@ function run() {
             processArgs();
             const ninja = yield findNinja();
             const meson = yield findMeson();
-            let gcovr = '';
-            let clangTidy = '';
             if (!fs.existsSync(directory) || !fs.existsSync(path.join(directory, NINJA_FILE))) {
                 core.info('Project isn\'t setup yet. Setting it up.');
                 let setupArgs = ['setup', directory];
