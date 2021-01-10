@@ -1037,7 +1037,7 @@ function processArgs() {
     const setupOptionsTmp = core.getInput(SETUP_OPTIONS);
     core.debug(`Processing setup options argument: ${setupOptionsTmp}`);
     if (setupOptionsTmp.length > 0) {
-        setupOptions = setupOptionsTmp;
+        setupOptions = setupOptionsTmp.split(" ");
     }
     else {
         setupOptions = undefined;
@@ -1045,7 +1045,7 @@ function processArgs() {
     const optionsTmp = core.getInput(OPTIONS);
     core.debug(`Processing options argument: ${optionsTmp}`);
     if (optionsTmp.length > 0) {
-        options = optionsTmp;
+        options = optionsTmp.split(" ");
     }
     else {
         options = undefined;
