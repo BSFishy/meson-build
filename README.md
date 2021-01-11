@@ -11,14 +11,14 @@ Basic:
 steps:
 - uses: actions/checkout@v2
 - uses: actions/setup-python@v1
-- uses: BSFishy/meson-build@v1.0.1
+- uses: BSFishy/meson-build@v1.0.2
   with:
     action: test
 ```
 
 All options:
 ```yaml
-- uses: BSFishy/meson-build@v1.0.1
+- uses: BSFishy/meson-build@v1.0.2
   with:
     action: test
     directory: build
