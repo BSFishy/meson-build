@@ -36,8 +36,8 @@ const TIDY: string = MesonAction.Tidy;
 
 var action: MesonAction;
 var directory: string;
-var setupOptions: string | undefined;
-var options: string | undefined;
+var setupOptions: string[] | undefined;
+var options: string[] | undefined;
 var ninjaVersion: string;
 var mesonVersion: string;
 var gcovrVersion: string;
@@ -269,7 +269,7 @@ export async function run() {
             args = args.concat(options);
         
         core.debug(`Running: ${command} ${args.join(' ')}`);
-        await exec.exec(command, args);
+        await exec.exec(`"${command}"`, args);
     } catch (err) {
         core.setFailed(err.message);
     }
