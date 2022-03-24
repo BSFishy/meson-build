@@ -1260,7 +1260,8 @@ function run() {
                     args = [TEST, '-C', directory];
                     break;
                 case MesonAction.Coverage:
-                    command = yield findCoverage();
+                    _ = yield findCoverage();
+                    command = ninja;
                     args = ['-C', directory, COVERAGE];
                     break;
                 case MesonAction.Tidy:
