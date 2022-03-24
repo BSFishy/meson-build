@@ -256,7 +256,8 @@ export async function run() {
                 args = [TEST, '-C', directory];
                 break;
             case MesonAction.Coverage:
-                command = await findCoverage();
+                _ = await findCoverage();
+                command = ninja;
                 args = ['-C', directory, COVERAGE];
                 break;
             case MesonAction.Tidy:
